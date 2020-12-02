@@ -1,3 +1,16 @@
+/**********************************************************************************
+* @file           : main.c														  *
+* @brief          : 															  * 
+***********************************************************************************
+*				DS1307	.	C			  										  *
+***********************************************************************************
+/--File Histroy ------------------------------------------------------------------/
+*	Date			Version		Name	Description							      *
+/---------------------------------------------------------------------------------/
+*	25-Nov-2020		01.00		GAN		Initial Development.	  			  	  *
+**********************************************************************************/
+
+/* Includes */
 #include "ds1307.h"
 
 /*	DS1307_Init handles all the initialization
@@ -163,58 +176,55 @@ DS1307_RESULT DS1307_SelectRate(DS1307_Handle* handle, DS1307_RATE rate) {
 
 DS1307_TIME DS1307_GetTime(DS1307_Handle* handle) {
 
-	DS1307_TIME time;
+	DS1307_TIME OrgTime = {0};
 	if (DS1307_WaitUntilReady(handle) == DS1307_RES_OK) {
-
-
-
-		time.year = 0;
-		time.month = 0;
-		time.date = 0;
-		time.day = 0;
-		time.hour = 0;
-		time.minute = 0;
-		time.second = 0;
+		OrgTime.year = 0;
+		OrgTime.month = 0;
+		OrgTime.date = 0;
+		OrgTime.day = 0;
+		OrgTime.hour = 0;
+		OrgTime.minute = 0;
+		OrgTime.second = 0;
 
 		uint8_t data[8];
 
 		uint8_t a = 0;
 		if (HAL_I2C_Master_Transmit(handle->i2c, handle->DS1307_ADDRESS, &a, 1,
 				handle->TIMEOUT)) {
-			return time;
+			return OrgTime;
 		}
 		if (HAL_I2C_Master_Receive(handle->i2c, handle->DS1307_ADDRESS, data, 8,
 				handle->TIMEOUT)) {
-			return time;
+			return OrgTime;
 		}
 
-		time.second += data[0] & 0xF;
-		time.second += 10 * ((data[0] & 0x70) >> 4);
+		OrgTime.second += data[0] & 0xF;
+		OrgTime.second += 10 * ((data[0] & 0x70) >> 4);
 
-		time.minute += data[1] & 0xF;
-		time.minute += 10 * ((data[1] & 0x70) >> 4);
+		OrgTime.minute += data[1] & 0xF;
+		OrgTime.minute += 10 * ((data[1] & 0x70) >> 4);
 
 		if (data[2] & (1 << 6)) {	//12H
 
 		} else {	//24H
-			time.hour += data[2] & 0xF;
-			time.hour += 10 * ((data[2] & 0x30) >> 4);
+			OrgTime.hour += data[2] & 0xF;
+			OrgTime.hour += 10 * ((data[2] & 0x30) >> 4);
 		}
 
-		time.day += data[3] & 0x7;
+		OrgTime.day += data[3] & 0x7;
 
-		time.date += data[4] & 0xF;
-		time.date += 10 * ((data[4] & 0x30) >> 4);
+		OrgTime.date += data[4] & 0xF;
+		OrgTime.date += 10 * ((data[4] & 0x30) >> 4);
 
-		time.month += data[5] & 0xF;
-		time.month += 10 * ((data[5] & 0x10) >> 4);
+		OrgTime.month += data[5] & 0xF;
+		OrgTime.month += 10 * ((data[5] & 0x10) >> 4);
 
-		time.year += 2000 + (data[6] & 0xF);
-		time.year += 10 * ((data[6] & 0xF0) >> 4);
+		OrgTime.year += 2000 + (data[6] & 0xF);
+		OrgTime.year += 10 * ((data[6] & 0xF0) >> 4);
 		DS1307_WaitUntilReady(handle);
-		return time;
+		return OrgTime;
 	}
-	return time;
+	return OrgTime;
 }
 
 /*	DS1307_SetTime programs the current time into the RTC
