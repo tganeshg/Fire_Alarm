@@ -145,6 +145,9 @@ int main(void)
 	debugUartInit();
 	ADCInit();
 
+	/* Welcome */
+	uPrintf("!! Fire Alarm Version 1.00 !!\r\n");
+
 	if (confDS1307() != DS1307_RES_OK)
   	{
 		uPrintf("Time  DS1307 Init done !!\r\n");

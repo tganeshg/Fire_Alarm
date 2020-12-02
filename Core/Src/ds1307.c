@@ -38,7 +38,7 @@ DS1307_RESULT DS1307_Init(DS1307_Handle* handle) {
 	handle->i2c->Init.GeneralCallMode = I2C_GENERALCALL_DISABLED;
 	handle->i2c->Init.NoStretchMode = I2C_NOSTRETCH_DISABLED;
 
-	HAL_I2C_MspInit(handle->i2c);
+	//HAL_I2C_MspInit(handle->i2c);
 	HAL_I2C_Init(handle->i2c);
 	return DS1307_WaitUntilReady(handle);
 }
